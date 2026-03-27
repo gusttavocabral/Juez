@@ -3,17 +3,21 @@ import React, { useState, useEffect } from 'react';
 const Settings = () => {
   const [apiKey, setApiKey] = useState('');
   const [datajudKey, setDatajudKey] = useState('');
+  const [escavadorKey, setEscavadorKey] = useState('');
 
   useEffect(() => {
     const savedKey = localStorage.getItem('GEMINI_API_KEY');
     const savedDatajud = localStorage.getItem('DATAJUD_API_KEY');
+    const savedEscavador = localStorage.getItem('ESCAVADOR_API_KEY');
     if (savedKey) setApiKey(savedKey);
     if (savedDatajud) setDatajudKey(savedDatajud);
+    if (savedEscavador) setEscavadorKey(savedEscavador);
   }, []);
 
   const saveKey = () => {
     localStorage.setItem('GEMINI_API_KEY', apiKey);
     localStorage.setItem('DATAJUD_API_KEY', datajudKey);
+    localStorage.setItem('ESCAVADOR_API_KEY', escavadorKey);
     alert('Configurações salvas localmente!');
   };
 
@@ -23,35 +27,45 @@ const Settings = () => {
         <h2 style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', margin: '0 0 0.5rem', letterSpacing: '-0.025em' }}>
           Configurações de APIs
         </h2>
-        <p style={{ color: 'var(--text-muted)' }}>Configure suas chaves para habilitar as buscas reais e IA.</p>
+        <p style={{ color: 'var(--text-muted)' }}>Centralize suas chaves para monitoramento em tempo real.</p>
       </header>
 
       <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div>
-          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>GOOGLE AI STUDIO (GEMINI)</label>
-          <input 
-            type="password" 
-            placeholder="AIza..." 
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)' }}
-          />
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            Obtenha sua chave gratuita em <a href="https://aistudio.google.com/app/apikey" target="_blank" style={{ color: 'var(--primary)' }}>Google AI Studio</a>.
-          </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>GOOGLE AI STUDIO (GEMINI)</label>
+            <input 
+              type="password" 
+              placeholder="AIza..." 
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>CNJ DATAJUD (API KEY)</label>
+            <input 
+              type="password" 
+              placeholder="Public Key do CNJ..." 
+              value={datajudKey}
+              onChange={(e) => setDatajudKey(e.target.value)}
+              style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)' }}
+            />
+          </div>
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>CNJ DATAJUD (API KEY)</label>
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem' }}>ESCAVADOR API (OPCIONAL)</label>
           <input 
             type="password" 
-            placeholder="Public Key do CNJ..." 
-            value={datajudKey}
-            onChange={(e) => setDatajudKey(e.target.value)}
+            placeholder="Seu Token do Escavador..." 
+            value={escavadorKey}
+            onChange={(e) => setEscavadorKey(e.target.value)}
             style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)' }}
           />
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            A chave do Datajud é gratuita e pode ser solicitada no <a href="https://comunidade.datajud.cnj.jus.br/" target="_blank" style={{ color: 'var(--primary)' }}>Fórum do CNJ.</a>
+            O Escavador permite buscar processos em instâncias que o Datajud às vezes demora a atualizar.
           </p>
         </div>
 

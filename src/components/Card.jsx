@@ -48,9 +48,20 @@ const Card = ({ data }) => {
             <a 
               href={`https://www.google.com/search?q=consulta+processo+${process}+${court}`} 
               target="_blank" 
+              rel="noreferrer"
               style={{ fontSize: '0.75rem', color: 'var(--secondary)', textDecoration: 'none' }}>
               [Ver no Tribunal]
             </a>
+            <button 
+              onClick={() => {
+                const title = `Prazo: ${process} - ${entity}`;
+                const details = `Movimentação: ${status}\n\nImpacto: ${ai.impact}\n\nLink: https://www.google.com/search?q=consulta+processo+${process}`;
+                const gCalUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}`;
+                window.open(gCalUrl, '_blank');
+              }}
+              style={{ background: 'none', border: 'none', color: '#16a34a', cursor: 'pointer', fontSize: '0.75rem', padding: 0, fontWeight: '600' }}>
+              [📅 Agendar no Google]
+            </button>
           </div>
         </div>
         <time style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{date}</time>

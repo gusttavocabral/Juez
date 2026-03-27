@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import { fetchProcessesFromDatajud } from '../services/legalService';
+import { fetchProcessesFromEscavador } from '../services/escavadorService';
 import { summarizeMovement } from '../services/aiService';
 
 const Feed = () => {
@@ -24,25 +25,32 @@ const Feed = () => {
 
     try {
       for (const entity of savedEntities) {
-        const processes = await fetchProcessesFromDatajud(entity.value);
+        // Busca em ambas as fontes simultaneamente
+        const [datajudResults, escavadorResults] = await Promise.all([
+          fetchProcessesFromDatajud(entity.value),
+          fetchProcessesFromEscavador(entity.value)
+        ]);
         
-        for (const proc of processes) {
-          // Pega a última movimentação para resumir
-          const lastMovement = proc.movimentacoes?.[0];
+        const combinedProcesses = [...datajudResults, ...escavadorResults];
+
+        for (const proc of combinedProcesses) {
+          // Identifica a última movimentação (Lógica varia por API)
+          const lastMovement = proc.movimentacoes?.[0] || proc.ultima_movimentacao;
           if (lastMovement) {
-            const aiResult = await summarizeMovement(lastMovement.descricao);
+            const desc = lastMovement.descricao || lastMovement.texto || 'Movimentação detectada';
+            const aiResult = await summarizeMovement(desc);
             
             allMovements.push({
-              id: proc.numeroProcesso,
+              id: proc.numeroProcesso || proc.numero_processo,
               entity: entity.label,
-              court: proc.tribunal,
-              process: proc.numeroProcesso,
-              date: new Date(lastMovement.dataHora).toLocaleString(),
-              status: lastMovement.descricao,
+              court: proc.tribunal || proc.orgao_julgador || 'Tribunal',
+              process: proc.numeroProcesso || proc.numero_processo,
+              date: new Date(lastMovement.dataHora || lastMovement.data).toLocaleString(),
+              status: desc,
               ai: aiResult || {
-                summary: lastMovement.descricao,
-                translation: 'Tradução não disponível. Configure sua chave Gemini.',
-                impact: 'Verifique os detalhes no tribunal.'
+                summary: desc,
+                translation: 'Configure sua chave Gemini para tradução automática.',
+                impact: 'Verifique no tribunal para detalhes.'
               }
             });
           }
