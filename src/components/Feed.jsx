@@ -90,8 +90,12 @@ const Feed = () => {
       </header>
 
       {error && (
-        <div className="glass" style={{ padding: '1rem', color: '#ef4444', borderRadius: 'var(--radius-md)' }}>
-          {error}
+        <div className="glass" style={{ padding: '1.5rem', color: '#ef4444', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239, 68, 68, 0.2)', background: 'rgba(239, 68, 68, 0.05)' }}>
+          <h4 style={{ margin: '0 0 0.5rem' }}>Opa! Algo deu errado:</h4>
+          <p style={{ fontSize: '0.875rem' }}>{error}</p>
+          <p style={{ fontSize: '0.75rem', marginTop: '1rem', color: 'var(--text-muted)' }}>
+            Dica: Abra o console do navegador (F12) para ver os detalhes técnicos. Pode ser um erro de CORS ou chave inválida.
+          </p>
         </div>
       )}
 
