@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Monitoring = () => {
-  const [entities, setEntities] = useState([
-    { id: 1, type: 'CPF', value: '***.456.***-01', label: 'J. Silva' },
-    { id: 2, type: 'CNPJ', value: '12.345.678/0001-90', label: 'Empresa ABC' }
-  ]);
+  const [entities, setEntities] = useState(() => {
+    const saved = localStorage.getItem('MONITORED_ENTITIES');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, type: 'CPF', value: '***.456.***-01', label: 'J. Silva' },
+      { id: 2, type: 'CNPJ', value: '12.345.678/0001-90', label: 'Empresa ABC' }
+    ];
+  });
   const [inputValue, setInputValue] = useState('');
   const [inputLabel, setInputLabel] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('MONITORED_ENTITIES', JSON.stringify(entities));
+  }, [entities]);
 
   const fetchEntityInfo = async (value) => {
     const cleanValue = value.replace(/\D/g, '');
@@ -64,7 +70,7 @@ const Monitoring = () => {
             placeholder="Digite apenas números..." 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'white', fontSize: '1rem' }}
+            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)', fontSize: '1rem' }}
           />
         </div>
         <div style={{ flex: 1 }}>
@@ -74,7 +80,7 @@ const Monitoring = () => {
             placeholder="Ex: Minha Empresa" 
             value={inputLabel}
             onChange={(e) => setInputLabel(e.target.value)}
-            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'white', fontSize: '1rem' }}
+            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'var(--text-main)', fontSize: '1rem' }}
           />
         </div>
         <button 
