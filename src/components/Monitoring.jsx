@@ -8,17 +8,39 @@ const Monitoring = () => {
   const [inputValue, setInputValue] = useState('');
   const [inputLabel, setInputLabel] = useState('');
 
-  const addEntity = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchEntityInfo = async (value) => {
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length === 14) { // CNPJ
+      try {
+        const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanValue}`);
+        const data = await response.json();
+        return data.razao_social || data.nome_fantasia || 'Empresa Localizada';
+      } catch (e) {
+        return 'Empresa (Dados não encontrados)';
+      }
+    }
+    return null; // CPF (Não há API gratuita simples para nome de CPF)
+  };
+
+  const addEntity = async () => {
     if (!inputValue) return;
+    setIsLoading(true);
+    
+    const foundLabel = await fetchEntityInfo(inputValue);
+    
     const newEntity = {
       id: Date.now(),
-      type: inputValue.length > 11 ? 'CNPJ' : 'CPF',
+      type: inputValue.replace(/\D/g, '').length > 11 ? 'CNPJ' : 'CPF',
       value: inputValue,
-      label: inputLabel || 'Sem nome'
+      label: foundLabel || inputLabel || 'Documento Validado'
     };
+    
     setEntities([...entities, newEntity]);
     setInputValue('');
     setInputLabel('');
+    setIsLoading(false);
   };
 
   const removeEntity = (id) => {
@@ -28,37 +50,48 @@ const Monitoring = () => {
   return (
     <div className="animate-fade" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <header>
-        <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: 'var(--text-main)', margin: '0 0 0.5rem' }}>
+        <h2 style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', margin: '0 0 0.5rem', letterSpacing: '-0.025em' }}>
           Meus Monitoramentos
         </h2>
-        <p style={{ color: 'var(--text-muted)' }}>Adicione CPFs ou CNPJs para receber atualizações automáticas.</p>
+        <p style={{ color: 'var(--text-muted)' }}>Os dados de CNPJ são puxados automaticamente da base da Receita Federal.</p>
       </header>
 
-      <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)', display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+      <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)', display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem' }}>CPF OU CNPJ</label>
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>CPF OU CNPJ</label>
           <input 
             type="text" 
-            placeholder="000.000.000-00" 
+            placeholder="Digite apenas números..." 
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)' }}
+            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'white', fontSize: '1rem' }}
           />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.5rem' }}>APELIDO (EX: MEU CPF)</label>
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>APELIDO (OPCIONAL)</label>
           <input 
             type="text" 
-            placeholder="Nome para identificar" 
+            placeholder="Ex: Minha Empresa" 
             value={inputLabel}
             onChange={(e) => setInputLabel(e.target.value)}
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)' }}
+            style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--glass-bg)', color: 'white', fontSize: '1rem' }}
           />
         </div>
         <button 
           onClick={addEntity}
-          style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: '600', cursor: 'pointer' }}>
-          Adicionar
+          disabled={isLoading}
+          style={{ 
+            padding: '1rem 2rem', 
+            borderRadius: 'var(--radius-md)', 
+            border: 'none', 
+            background: 'var(--primary)', 
+            color: 'white', 
+            fontWeight: '700', 
+            cursor: 'pointer',
+            transition: 'opacity 0.2s',
+            opacity: isLoading ? 0.5 : 1
+          }}>
+          {isLoading ? 'Buscando...' : 'Monitorar'}
         </button>
       </div>
 

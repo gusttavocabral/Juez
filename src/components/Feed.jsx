@@ -53,10 +53,10 @@ const Feed = () => {
   return (
     <div className="animate-fade" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <header>
-        <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: 'var(--text-main)', margin: '0 0 0.5rem' }}>
-          Feed de Atualizações
+        <h2 style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', margin: '0 0 0.5rem', letterSpacing: '-0.025em' }}>
+          Timeline Juez
         </h2>
-        <p style={{ color: 'var(--text-muted)' }}>Acompanhando 2 documentos monitorados</p>
+        <p style={{ color: 'var(--text-muted)' }}>Acompanhando seus documentos em tempo real.</p>
       </header>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>

@@ -1,16 +1,16 @@
 :root {
-  --primary: #006a4f;
-  --primary-light: #00a379;
-  --secondary: #6366f1;
-  --bg-color: #f8fafc;
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg: rgba(255, 255, 255, 0.3);
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border-color: rgba(226, 232, 240, 0.8);
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --radius-lg: 1rem;
+  --primary: #8b5cf6;
+  --primary-light: #a78bfa;
+  --secondary: #3b82f6;
+  --bg-color: #0f172a;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --glass-bg: rgba(15, 23, 42, 0.5);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --radius-lg: 1.25rem;
   --radius-md: 0.75rem;
   
   font-family: 'Inter', system-ui, -apple-system, sans-serif;

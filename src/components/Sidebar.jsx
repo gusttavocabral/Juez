@@ -20,15 +20,15 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     }}>
       <div style={{ padding: '0 1rem' }}>
         <h1 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: '700', 
+          fontSize: '2rem', 
+          fontWeight: '900', 
           color: 'var(--primary)',
           margin: 0,
-          letterSpacing: '-0.025em'
+          letterSpacing: '-0.05em'
         }}>
-          Feed Jurídico
+          Juez
         </h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Inteligente</p>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Personal Monitor</p>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -57,7 +57,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </nav>
 
       <div style={{ marginTop: 'auto', padding: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-        <p>© 2024 Judge App</p>
+        <p>© 2024 Juez</p>
         <p style={{ marginTop: '0.5rem' }}>Aviso: Não substitui orientação jurídica profissional.</p>
       </div>
     </aside>
