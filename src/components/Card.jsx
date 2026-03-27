@@ -34,10 +34,23 @@ const Card = ({ data }) => {
 
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--primary)', textTransform: 'uppercase' }}>
-            {status}
-          </span>
-          <h3 style={{ margin: '0.25rem 0', fontSize: '1.125rem', color: 'var(--text-main)' }}>{entity}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', textTransform: 'uppercase' }}>
+              {status}
+            </span>
+            <span style={{ 
+              fontSize: '0.625rem', 
+              fontWeight: '900', 
+              padding: '2px 8px', 
+              borderRadius: '20px', 
+              background: data.status_limpo === 'Finalizado' ? '#f1f5f9' : 'rgba(22, 163, 74, 0.1)', 
+              color: data.status_limpo === 'Finalizado' ? '#64748b' : '#16a34a',
+              border: `1px solid ${data.status_limpo === 'Finalizado' ? '#e2e8f0' : 'rgba(22, 163, 74, 0.2)'}`
+            }}>
+              {data.status_limpo || 'Ativo'}
+            </span>
+          </div>
+          <h3 style={{ margin: '0.25rem 0', fontSize: '1.25rem', color: 'var(--text-main)', fontWeight: '800' }}>{entity}</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{court} • {process}</p>
             <button 

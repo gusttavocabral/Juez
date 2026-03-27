@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { getProcessCounts } from '../services/legalService';
 
 const Monitoring = () => {
   const [entities, setEntities] = useState(() => {
     const saved = localStorage.getItem('MONITORED_ENTITIES');
     return saved ? JSON.parse(saved) : [
-      { id: 1, type: 'CPF', value: '***.456.***-01', label: 'J. Silva' },
-      { id: 2, type: 'CNPJ', value: '12.345.678/0001-90', label: 'Empresa ABC' }
+      { id: 1, type: 'CPF', value: '***.456.***-01', label: 'J. Silva', counts: { active: 0, total: 0 } },
+      { id: 2, type: 'CNPJ', value: '12.345.678/0001-90', label: 'Empresa ABC', counts: { active: 0, total: 0 } }
     ];
   });
   const [inputValue, setInputValue] = useState('');
@@ -14,7 +15,22 @@ const Monitoring = () => {
 
   useEffect(() => {
     localStorage.setItem('MONITORED_ENTITIES', JSON.stringify(entities));
-  }, [entities]);
+    // Tenta carregar as contagens para as entidades existentes
+    updateAllCounts();
+  }, [entities.length]);
+
+  const updateAllCounts = async () => {
+    const newEntities = [...entities];
+    let changed = false;
+    for (let e of newEntities) {
+      if (!e.counts || (e.counts.active === 0 && e.counts.total === 0)) {
+        const c = await getProcessCounts(e.value);
+        e.counts = c;
+        changed = true;
+      }
+    }
+    if (changed) setEntities(newEntities);
+  };
 
   const fetchEntityInfo = async (value) => {
     const cleanValue = value.replace(/\D/g, '');
@@ -27,7 +43,7 @@ const Monitoring = () => {
         return 'Empresa (Dados não encontrados)';
       }
     }
-    return null; // CPF (Não há API gratuita simples para nome de CPF)
+    return null; // CPF
   };
 
   const addEntity = async () => {
@@ -35,12 +51,14 @@ const Monitoring = () => {
     setIsLoading(true);
     
     const foundLabel = await fetchEntityInfo(inputValue);
+    const counts = await getProcessCounts(inputValue);
     
     const newEntity = {
       id: Date.now(),
       type: inputValue.replace(/\D/g, '').length > 11 ? 'CNPJ' : 'CPF',
       value: inputValue,
-      label: foundLabel || inputLabel || 'Documento Validado'
+      label: foundLabel || inputLabel || 'Documento Validado',
+      counts: counts
     };
     
     setEntities([...entities, newEntity]);
@@ -104,10 +122,21 @@ const Monitoring = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
         {entities.map(e => (
           <div key={e.id} className="glass" style={{ padding: '1.25rem', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
+            <div style={{ flex: 1 }}>
               <p style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '0.25rem' }}>{e.type}</p>
               <h4 style={{ margin: 0, fontSize: '1.125rem' }}>{e.label}</h4>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{e.value}</p>
+              
+              <div style={{ marginTop: '0.75rem', display: 'flex', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: '700' }}>ATIVOS</p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: '800', color: '#16a34a' }}>{e.counts?.active || 0}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: '700' }}>TOTAL</p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>{e.counts?.total || 0}</p>
+                </div>
+              </div>
             </div>
             <button 
               onClick={() => removeEntity(e.id)}

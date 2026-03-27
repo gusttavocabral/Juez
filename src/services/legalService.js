@@ -1,28 +1,26 @@
 export const fetchProcessesFromDatajud = async (document) => {
   const apiKey = localStorage.getItem('DATAJUD_API_KEY');
-  if (!apiKey) {
-    console.warn('Datajud: Nenhuma chave API encontrada no localStorage.');
-    return [];
-  }
+  if (!apiKey) return [];
 
-  // Lista de tribunais comuns para tentar a busca (Datajud exige endpoint por tribunal)
-  const courts = ['tjsp', 'trf3', 'trf1', 'tjrj', 'tjmg']; 
   const cleanDocument = document.replace(/\D/g, '');
   
-  console.log(`Datajud: Iniciando busca para o documento: ${cleanDocument}`);
+  const courts = [
+    'tjsp', 'trf3', 'trf1', 'tjrj', 'tjmg', 'stj', 'stf'
+  ]; 
 
   const searchInCourt = async (court) => {
     const url = `https://api-publica.datajud.cnj.jus.br/api_publica_${court}/_search`;
+    
+    // Usando CORS Proxy para evitar bloqueio no Vercel/Navegador
+    const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+    
     const query = {
-      "query": {
-        "match": {
-          "identificadorExterno": cleanDocument
-        }
-      }
+      "query": { "match": { "identificadorExterno": cleanDocument } },
+      "size": 50
     };
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(proxiedUrl, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -31,21 +29,34 @@ export const fetchProcessesFromDatajud = async (document) => {
         body: JSON.stringify(query)
       });
 
-      if (!response.ok) {
-        console.error(`Datajud [${court}]: Erro na resposta (${response.status})`);
-        return [];
-      }
+      if (!response.ok) return [];
 
       const data = await response.json();
-      console.log(`Datajud [${court}]: Encontrados ${data.hits?.total?.value || 0} processos.`);
-      return data.hits?.hits?.map(hit => ({ ...hit._source, tribunal: court.toUpperCase() })) || [];
+      return data.hits?.hits?.map(hit => {
+        const source = hit._source;
+        const lastMove = source.movimentacoes?.[0]?.descricao?.toLowerCase() || '';
+        const isFinished = lastMove.includes('arquivado') || lastMove.includes('baixa') || lastMove.includes('baixa definitiva');
+        
+        return {
+          ...source,
+          tribunal: court.toUpperCase(),
+          status_limpo: isFinished ? 'Finalizado' : 'Ativo'
+        };
+      }) || [];
     } catch (e) {
-      console.error(`Datajud [${court}]: Falha na requisição. Verifique se há erro de CORS no navegador.`, e);
+      console.error(`Erro no tribunal ${court}:`, e);
       return [];
     }
   };
 
-  // Tenta em todos os tribunais da lista
   const results = await Promise.all(courts.map(court => searchInCourt(court)));
   return results.flat();
+};
+
+export const getProcessCounts = async (document) => {
+  const processes = await fetchProcessesFromDatajud(document);
+  if (!processes) return { active: 0, total: 0 };
+  const active = processes.filter(p => p.status_limpo === 'Ativo').length;
+  const total = processes.length;
+  return { active, total };
 };
